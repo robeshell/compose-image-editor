@@ -1,5 +1,7 @@
 # imageeditor
 
+**English** | [简体中文](./README.zh-CN.md)
+
 A Compose-first, WeChat-style image editor for Android: **crop / rotate, freehand
 draw, mosaic, text, and stickers** — with a single entry composable and a clean,
 business-agnostic input/output contract.
@@ -158,10 +160,8 @@ exported image already has correct pixel orientation (no EXIF rotation tag).
 
 ## Known limitations
 
-- **Mosaic is drag-only** — a single tap does not paint (uses drag gestures).
-- **Undo only, no redo.**
-- **Text has no outline** — light text on light photos can be hard to read.
-- **Stickers are host-provided** — the module ships no assets.
+- **Stickers are host-provided** — the module ships no assets (inject via `StickerProvider`).
+- **Text styling is limited** to color plus an automatic contrast shadow (no custom font / full outline yet).
 
 ## Roadmap
 
