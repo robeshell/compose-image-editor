@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    `maven-publish`
 }
 
 android {
@@ -20,6 +21,28 @@ android {
     kotlinOptions { jvmTarget = "11" }
 
     buildFeatures { compose = true }
+
+    // 供 maven-publish / JitPack 使用的发布变体
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+// JitPack:发布 release AAR。JitPack 会以 tag 作为版本号。
+// 消费坐标(多模块):com.github.robeshell.compose-image-editor:imageeditor:<tag>
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.robeshell.compose-image-editor"
+                artifactId = "imageeditor"
+                version = "0.1.0"
+            }
+        }
+    }
 }
 
 dependencies {
