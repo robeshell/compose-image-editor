@@ -23,7 +23,15 @@ bridged into Compose via `AndroidView`.
 
 ## Install
 
-### Via JitPack (recommended)
+### Via Maven Central
+
+```kotlin
+implementation("io.github.robeshell:compose-image-editor:0.1.0")
+```
+
+> Requires the maintainer to have published the release — see [PUBLISHING.md](./PUBLISHING.md).
+
+### Via JitPack
 
 Add JitPack to your repositories (`settings.gradle.kts`):
 
@@ -159,10 +167,10 @@ exported image already has correct pixel orientation (no EXIF rotation tag).
 
 - [x] Sample app
 - [x] JitPack publishing
-- [ ] Maven Central publishing
-- [ ] Unit tests (EXIF, mosaic coordinate mapping, undo routing)
-- [ ] Text outline / shadow option
-- [ ] Mosaic tap support, redo
+- [x] Unit tests (EXIF, mosaic coordinate mapping, undo routing)
+- [x] Text shadow for readability
+- [x] Mosaic tap support + redo
+- [~] Maven Central publishing — configured; needs a Sonatype namespace + GPG key to release (see [PUBLISHING.md](./PUBLISHING.md))
 
 ## License
 
