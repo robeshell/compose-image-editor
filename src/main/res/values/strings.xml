@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Top bar -->
+    <string name="ie_back">Back</string>
+    <string name="ie_undo">Undo</string>
+
+    <!-- Tools -->
+    <string name="ie_tool_draw">Draw</string>
+    <string name="ie_tool_mosaic">Mosaic</string>
+    <string name="ie_tool_text">Text</string>
+    <string name="ie_tool_sticker">Sticker</string>
+    <string name="ie_eraser">Eraser</string>
+    <string name="ie_done">Done</string>
+
+    <!-- Text input dialog -->
+    <string name="ie_text_hint">Enter text</string>
+    <string name="ie_cancel">Cancel</string>
+    <string name="ie_confirm">OK</string>
+
+    <!-- Discard confirm -->
+    <string name="ie_discard_title">Discard changes?</string>
+    <string name="ie_discard_message">Your edits will not be saved.</string>
+    <string name="ie_discard_confirm">Discard</string>
+    <string name="ie_discard_keep">Keep editing</string>
+</resources>
