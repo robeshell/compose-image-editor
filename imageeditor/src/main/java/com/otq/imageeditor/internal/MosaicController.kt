@@ -41,15 +41,18 @@ internal class MosaicController(
     }
 
     private val strokes = ArrayList<Path>()
+    private val redoStrokes = ArrayList<Path>()
     private var current: Path? = null
     private val seg = Path()
     private var lastX = 0f
     private var lastY = 0f
 
     fun begin(x: Float, y: Float) {
-        current = Path().apply { moveTo(x, y) }
+        // 起点埋一个极短段:drawPath 配 ROUND cap 会渲染成圆点,
+        // 这样纯点按(begin+commit,无 extend)在重放(rerender)时也能保留马赛克点。
+        current = Path().apply { moveTo(x, y); lineTo(x + 0.1f, y) }
         lastX = x; lastY = y
-        canvas.drawPoint(x, y, paint) // 起点画个圆点,点按也能出马赛克
+        canvas.drawPath(current!!, paint)
         onBaked(working)
     }
 
@@ -66,12 +69,30 @@ internal class MosaicController(
         val c = current ?: return
         strokes.add(c)
         current = null
+        redoStrokes.clear() // 新笔画使重做失效
         onStrokeCommitted()
     }
 
-    /** 撤销最近一笔马赛克:清空后按 base 重放剩余笔画。 */
+    /** 撤销最近一笔:转入重做栈,按 base 重放剩余笔画。 */
     fun undo() {
-        strokes.removeLastOrNull()
+        val p = strokes.removeLastOrNull() ?: return
+        redoStrokes.add(p)
+        rerender()
+    }
+
+    /** 重做最近撤销的一笔。 */
+    fun redo() {
+        val p = redoStrokes.removeLastOrNull() ?: return
+        strokes.add(p)
+        rerender()
+    }
+
+    /** 清空重做栈(其它子系统产生新操作时,马赛克的重做也应失效)。 */
+    fun clearRedo() {
+        redoStrokes.clear()
+    }
+
+    private fun rerender() {
         canvas.drawBitmap(base, 0f, 0f, null)
         for (p in strokes) canvas.drawPath(p, paint)
         onBaked(working)

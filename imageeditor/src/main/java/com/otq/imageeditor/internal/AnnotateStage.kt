@@ -136,7 +136,7 @@ internal fun AnnotateStage(
             theme = request.config.theme,
             palette = request.config.brushColors,
             onConfirm = { text, colorCode ->
-                editorState.editor.addText(text, colorCode)
+                editorState.editor.addText(text, buildTextStyle(colorCode, request.config.textShadow))
                 showTextDialog = false
             },
             onDismiss = { showTextDialog = false },
@@ -151,7 +151,7 @@ internal fun AnnotateStage(
             initialText = pending.text,
             initialColor = Color(pending.colorCode),
             onConfirm = { text, colorCode ->
-                editorState.editor.editText(pending.rootView, text, colorCode)
+                editorState.editor.editText(pending.rootView, text, buildTextStyle(colorCode, request.config.textShadow))
                 controller.pendingEditText = null
             },
             onDismiss = { controller.pendingEditText = null },

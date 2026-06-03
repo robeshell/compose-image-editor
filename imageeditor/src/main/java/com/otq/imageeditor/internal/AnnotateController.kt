@@ -2,7 +2,6 @@ package com.otq.imageeditor.internal
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -36,12 +35,17 @@ internal class AnnotateController(
         private set
 
     /**
-     * 全局操作时间序,用于单撤销键分流:
-     * - PhotoEditor 侧每笔涂鸦/文字/贴纸 → 经 onAddViewListener 压入 EDITOR
-     * - 马赛克每笔 → 压入 MOSAIC
-     * onRemoveViewListener 由我们自己的 undo 触发,不在此处改栈,避免重复计数。
+     * 全局撤销/重做协调器:只记操作来源时间序,具体撤销/重做分流到子系统。
+     * - PhotoEditor 侧每笔涂鸦/文字/贴纸 → onAddViewListener → 记 EDITOR
+     * - 马赛克每笔 → notifyMosaicStroke → 记 MOSAIC
      */
-    private val opStack = mutableStateListOf<OpSource>()
+    private val coordinator = UndoCoordinator()
+
+    /** 撤销/重做会触发 PhotoEditor 重新增删视图并回调监听,此标志避免把它误记成新操作。 */
+    private var suppressRecord = false
+
+    /** 历史版本号:任何撤销栈变化 +1,驱动 Compose 重算 canUndo/canRedo。 */
+    private var historyVersion by mutableStateOf(0)
 
     /** 马赛克控制器(由 AnnotateStage 在底图就绪后注入)。 */
     var mosaic: MosaicController? = null
@@ -55,7 +59,10 @@ internal class AnnotateController(
                 pendingEditText = PendingEditText(rootView, text, colorCode)
             }
             override fun onAddViewListener(viewType: ViewType, numberOfAddedViews: Int) {
-                opStack.add(OpSource.EDITOR)
+                if (suppressRecord) return
+                coordinator.record(OpSource.EDITOR)
+                mosaic?.clearRedo()
+                historyVersion++
             }
             override fun onRemoveViewListener(viewType: ViewType, numberOfAddedViews: Int) {}
             override fun onStartViewChangeListener(viewType: ViewType) {}
@@ -65,7 +72,10 @@ internal class AnnotateController(
     }
 
     /** 马赛克提交一笔时调用,记入全局时间序。 */
-    fun notifyMosaicStroke() { opStack.add(OpSource.MOSAIC) }
+    fun notifyMosaicStroke() {
+        coordinator.record(OpSource.MOSAIC)
+        historyVersion++
+    }
 
     fun selectDraw() {
         activeTool = ActiveTool.Draw
@@ -117,21 +127,35 @@ internal class AnnotateController(
 
     /** 单撤销键:弹出全局栈顶,分流到对应子系统撤销。 */
     fun undo() {
-        when (opStack.removeLastOrNull()) {
+        val source = coordinator.undo() ?: return
+        suppressRecord = true
+        when (source) {
             OpSource.EDITOR -> state.editor.undo()
             OpSource.MOSAIC -> mosaic?.undo()
-            null -> {}
         }
+        suppressRecord = false
+        historyVersion++
+    }
+
+    /** 单重做键:弹出重做栈顶,分流到对应子系统重做。 */
+    fun redo() {
+        val source = coordinator.redo() ?: return
+        suppressRecord = true
+        when (source) {
+            OpSource.EDITOR -> state.editor.redo()
+            OpSource.MOSAIC -> mosaic?.redo()
+        }
+        suppressRecord = false
+        historyVersion++
     }
 
     /** 是否有任何编辑(用于返回时判断是否需要二次确认)。 */
-    val hasEdits: Boolean get() = opStack.isNotEmpty()
+    val hasEdits: Boolean get() { historyVersion; return coordinator.canUndo }
 
-    val canUndo: Boolean get() = opStack.isNotEmpty()
+    val canUndo: Boolean get() { historyVersion; return coordinator.canUndo }
+
+    val canRedo: Boolean get() { historyVersion; return coordinator.canRedo }
 }
-
-/** 全局操作来源,用于单撤销键分流。 */
-internal enum class OpSource { EDITOR, MOSAIC }
 
 internal data class PendingEditText(
     val rootView: android.view.View,

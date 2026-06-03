@@ -3,6 +3,7 @@
     <!-- 顶栏 -->
     <string name="ie_back">返回</string>
     <string name="ie_undo">撤销</string>
+    <string name="ie_redo">重做</string>
 
     <!-- 工具 -->
     <string name="ie_tool_draw">涂鸦</string>

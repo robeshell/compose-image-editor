@@ -1,6 +1,7 @@
 package com.otq.imageeditor.internal
 
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +26,8 @@ internal fun MosaicOverlay(
     var size by remember { mutableStateOf(IntSize.Zero) }
 
     fun map(o: Offset): Offset {
-        if (size.width == 0 || size.height == 0) return Offset.Zero
-        return Offset(
-            x = (o.x / size.width) * controller.baseWidth,
-            y = (o.y / size.height) * controller.baseHeight,
-        )
+        val r = mapViewToBitmap(o.x, o.y, size.width, size.height, controller.baseWidth, controller.baseHeight)
+        return Offset(r[0], r[1])
     }
 
     Box(
@@ -45,6 +43,12 @@ internal fun MosaicOverlay(
                     onDragEnd = { controller.commit() },
                     onDragCancel = { controller.commit() },
                 )
+            }
+            .pointerInput(controller) {
+                // 点按打码:落点画一个马赛克圆点
+                detectTapGestures(onTap = { o ->
+                    map(o).let { controller.begin(it.x, it.y); controller.commit() }
+                })
             }
     )
 }

@@ -3,6 +3,7 @@
     <!-- Top bar -->
     <string name="ie_back">Back</string>
     <string name="ie_undo">Undo</string>
+    <string name="ie_redo">Redo</string>
 
     <!-- Tools -->
     <string name="ie_tool_draw">Draw</string>

@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.EmojiEmotions
@@ -73,6 +74,12 @@ internal fun EditorScaffold(
                 Icon(
                     Icons.AutoMirrored.Filled.Undo, stringResource(R.string.ie_undo),
                     tint = if (controller.canUndo) theme.toolbarContent else theme.toolbarContent.copy(alpha = 0.3f),
+                )
+            }
+            IconButton(onClick = controller::redo, enabled = controller.canRedo) {
+                Icon(
+                    Icons.AutoMirrored.Filled.Redo, stringResource(R.string.ie_redo),
+                    tint = if (controller.canRedo) theme.toolbarContent else theme.toolbarContent.copy(alpha = 0.3f),
                 )
             }
         }

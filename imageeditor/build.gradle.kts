@@ -58,4 +58,6 @@ dependencies {
     // 编辑能力:裁剪(Apache-2.0) + 标注(MIT)。仅 implementation,不进公开签名。
     implementation(libs.android.image.cropper)
     implementation(libs.photoeditor)
+
+    testImplementation(libs.junit)
 }

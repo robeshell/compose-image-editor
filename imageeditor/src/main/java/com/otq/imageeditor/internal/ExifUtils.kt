@@ -39,17 +39,36 @@ internal object ExifUtils {
     }
 
     private fun applyExif(bmp: Bitmap, orientation: Int): Bitmap {
+        val t = exifTransform(orientation)
+        if (t.isIdentity) return bmp
         val m = Matrix()
-        when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270f)
-            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> m.postScale(-1f, 1f)
-            ExifInterface.ORIENTATION_FLIP_VERTICAL -> m.postScale(1f, -1f)
-            ExifInterface.ORIENTATION_TRANSPOSE -> { m.postRotate(90f); m.postScale(-1f, 1f) }
-            ExifInterface.ORIENTATION_TRANSVERSE -> { m.postRotate(270f); m.postScale(-1f, 1f) }
-            else -> return bmp
-        }
+        if (t.rotationDegrees != 0f) m.postRotate(t.rotationDegrees)
+        if (t.flipX) m.postScale(-1f, 1f)
+        if (t.flipY) m.postScale(1f, -1f)
         return Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
     }
+}
+
+/** EXIF 方向对应的几何变换(纯数据,无 Android 依赖,可单测)。 */
+internal data class ExifTransform(
+    val rotationDegrees: Float,
+    val flipX: Boolean,
+    val flipY: Boolean,
+) {
+    val isIdentity: Boolean get() = rotationDegrees == 0f && !flipX && !flipY
+}
+
+/**
+ * 把 EXIF orientation(1..8)映射为旋转角 + 翻转。
+ * 注:ExifInterface.ORIENTATION_* 为编译期常量,会被内联,故本函数在纯 JVM 下亦可运行。
+ */
+internal fun exifTransform(orientation: Int): ExifTransform = when (orientation) {
+    ExifInterface.ORIENTATION_ROTATE_90 -> ExifTransform(90f, false, false)
+    ExifInterface.ORIENTATION_ROTATE_180 -> ExifTransform(180f, false, false)
+    ExifInterface.ORIENTATION_ROTATE_270 -> ExifTransform(270f, false, false)
+    ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> ExifTransform(0f, true, false)
+    ExifInterface.ORIENTATION_FLIP_VERTICAL -> ExifTransform(0f, false, true)
+    ExifInterface.ORIENTATION_TRANSPOSE -> ExifTransform(90f, true, false)
+    ExifInterface.ORIENTATION_TRANSVERSE -> ExifTransform(270f, true, false)
+    else -> ExifTransform(0f, false, false)
 }

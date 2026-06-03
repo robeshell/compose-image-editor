@@ -21,6 +21,9 @@ data class ImageEditorConfig(
     /** 马赛克像素块边长(px),越大越糊。 */
     val mosaicBlockSize: Int = 24,
 
+    /** 文字是否加对比阴影(提升浅底/复杂背景上的可读性)。 */
+    val textShadow: Boolean = true,
+
     /** 贴纸素材来源;null = 不启用贴纸面板。 */
     val stickerProvider: StickerProvider? = null,
 
