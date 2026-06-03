@@ -26,7 +26,7 @@ bridged into Compose via `AndroidView`.
 ### Via Maven Central
 
 ```kotlin
-implementation("io.github.robeshell:compose-image-editor:0.1.0")
+implementation("io.github.robeshell:compose-image-editor:0.2.0")
 ```
 
 > Requires the maintainer to have published the release — see [PUBLISHING.md](./PUBLISHING.md).
@@ -48,7 +48,7 @@ dependencyResolutionManagement {
 Then depend on the library:
 
 ```kotlin
-implementation("com.github.robeshell:compose-image-editor:0.1.0")
+implementation("com.github.robeshell:compose-image-editor:0.2.0")
 ```
 
 ### As a Gradle module / git submodule
