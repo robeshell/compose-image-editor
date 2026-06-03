@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppCompat 主题(appcompat 由库经 cropper 传递可用),满足 CropImageActivity 要求 -->
+    <style name="Theme.Sample" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>
