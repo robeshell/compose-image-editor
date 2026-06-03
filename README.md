@@ -23,20 +23,40 @@ bridged into Compose via `AndroidView`.
 
 ## Install
 
-This module is currently consumed as a Gradle project module. Add it to your
-`settings.gradle.kts`:
+### Via JitPack (recommended)
+
+Add JitPack to your repositories (`settings.gradle.kts`):
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+```
+
+Then depend on the library:
+
+```kotlin
+implementation("com.github.robeshell:compose-image-editor:0.1.0")
+```
+
+### As a Gradle module / git submodule
+
+Alternatively include the source as a module (e.g. via git submodule). The
+library lives in the `imageeditor/` subdirectory of this repo, so point your
+host `settings.gradle.kts` at it:
 
 ```kotlin
 include(":imageeditor")
+project(":imageeditor").projectDir = file("path/to/compose-image-editor/imageeditor")
 ```
-
-and depend on it from your app:
 
 ```kotlin
 implementation(project(":imageeditor"))
 ```
-
-> Maven Central / JitPack publishing is not set up yet — see the roadmap below.
 
 ### ⚠️ Required setup — AppCompat theme for the crop activity
 
@@ -59,6 +79,24 @@ This module pulls `androidx.appcompat` (via the cropper), which may **bump
 `androidx.core` / `androidx.activity`** to newer versions than your app
 currently resolves. Watch for signature changes such as
 `Activity.onRequestPermissionsResult(..., permissions: Array<String>, ...)`.
+
+## Run the sample
+
+A runnable demo lives in `:sample` (pick an image → edit → see the result):
+
+```bash
+./gradlew :sample:installDebug
+```
+
+## Building from source
+
+This is a standard Android Gradle project. Cloning it standalone requires a
+`local.properties` at the repo root pointing to your Android SDK (Android Studio
+creates this automatically on first open):
+
+```properties
+sdk.dir=/path/to/Android/sdk
+```
 
 ## Usage
 
@@ -119,8 +157,9 @@ exported image already has correct pixel orientation (no EXIF rotation tag).
 
 ## Roadmap
 
-- [ ] Sample app
-- [ ] Maven Central / JitPack publishing
+- [x] Sample app
+- [x] JitPack publishing
+- [ ] Maven Central publishing
 - [ ] Unit tests (EXIF, mosaic coordinate mapping, undo routing)
 - [ ] Text outline / shadow option
 - [ ] Mosaic tap support, redo

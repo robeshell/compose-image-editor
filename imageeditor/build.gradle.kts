@@ -30,15 +30,15 @@ android {
     }
 }
 
-// JitPack:发布 release AAR。JitPack 会以 tag 作为版本号。
-// 消费坐标(多模块):com.github.robeshell.compose-image-editor:imageeditor:<tag>
+// JitPack:发布 release AAR,以 tag 作为版本号。
+// 消费坐标:com.github.robeshell:compose-image-editor:<tag>
 afterEvaluate {
     publishing {
         publications {
             register<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.github.robeshell.compose-image-editor"
-                artifactId = "imageeditor"
+                groupId = "com.github.robeshell"
+                artifactId = "compose-image-editor"
                 version = "0.1.0"
             }
         }
